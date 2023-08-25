@@ -1,1 +1,33 @@
-/node_modules
+# Carpeta node_modules generada por npm/yarn
+node_modules/
+
+# Archivo .env para variables de entorno
+.env
+
+# Carpeta build o dist donde se almacenan los archivos compilados
+build/
+dist/
+
+# Archivo de registro de errores
+error.log
+
+# Archivos de configuración locales
+*.log
+*.json
+*.lock
+*.swp
+
+# Carpeta para almacenar archivos de respaldo
+.backup/
+
+# Carpeta de dependencias de desarrollo generada por npm/yarn
+# Si usas npm
+npm-debug.log
+
+# Si usas yarn
+yarn-debug.log
+yarn-error.log
+
+# Carpetas y archivos ocultos de sistema
+.DS_Store
+Thumbs.db
