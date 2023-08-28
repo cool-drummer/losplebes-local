@@ -67,6 +67,8 @@ function cardTemplate(product, fileName) {
   <div class="card-producto card">
   <img src="${imageUrl}" class="card-img-top" style="height:300px" alt="Producto Imagen">
   <div class="card-product-content card-body">
+  <p class="nombre-producto">${product.productoCategoria}</p>
+
     <p class="nombre-producto">${product.productoNombre}</p>
     <p class="precio-producto card-text">$${product.productoPrecio}</p>
   </div>
@@ -118,5 +120,7 @@ fetch(
     console.error("Error al obtener las categorías:", error);
   });
 
+  
 // Cargar productos al inicio
-cargarProductosDeCategoria(/* ID de la categoría inicial */);
+cargarProductosDeCategoria();
+
