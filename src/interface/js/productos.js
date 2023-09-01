@@ -1,25 +1,45 @@
 const cardsContainer = document.getElementById("cards-container");
-const categoriesContainer = document.getElementById(
-  "cards-categories-container"
-);
-const productoPrecioBusqueda = document.getElementById(
-  "productoPrecioBusqueda"
-);
-
+const categoriesContainer = document.getElementById("cards-categories-container");
+const productoPrecioBusqueda = document.getElementById("productoPrecioBusqueda");
 const requestOptions = {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
 };
-
-let productosEnTabla = [];
-let subtotal = 0;
 const ivaPorcentaje = 0.16;
+const productosEnTabla = [];
+let subtotal = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
   barraBusquedaConsumo();
+  cargarCategorias(); // Cargar categorías al inicio
+  cargarProductosDeCategoria(null); // Cargar todos los productos al inicio
+
 });
+
+fetch(
+  "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesCategoria",
+  requestOptions
+)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data); 
+    data.forEach((category) => {
+      const categoryButton = createCategoryButton(category);
+      categoriesContainer.appendChild(categoryButton);
+    });
+  })
+  .catch((error) => {
+    console.error("Error al obtener las categorías:", error);
+  });
+cargarProductosDeCategoria();
+
 
 function barraBusquedaConsumo() {
   fetch(
@@ -50,8 +70,6 @@ function barraBusquedaConsumo() {
     });
 }
 
-
-
 function cardTemplate(product, fileName) {
   const imageUrl = `https://www.ta2.mx/imgPlebes/${fileName}`;
   const imageTag = new Image();
@@ -63,55 +81,14 @@ function cardTemplate(product, fileName) {
 
   return `
   <div class="card-producto card" onclick="agregarDetalle('${product.productoNombre}', '${product.productoPrecio}')">
-  <img src="${imageUrl}" class="card-img-top" style="height:300px" alt="Producto Imagen">
-  <div class="card-product-content card-body">
-  <p class="nombre-producto">${product.productoCategoria}</p>
-
-    <p class="nombre-producto">${product.productoNombre}</p>
-    <p class="precio-producto card-text">$${product.productoPrecio}</p>
-  </div>
+    <img src="${imageUrl}" class="card-img-top" style="height:300px" alt="Producto Imagen">
+    <div class="card-product-content card-body">
+      <p class="nombre-producto">${product.productoCategoria}</p>
+      <p class="nombre-producto">${product.productoNombre}</p>
+      <p class="precio-producto card-text">$${product.productoPrecio}</p>
+    </div>
 </div>
   `;
-}
-
-// Esta función carga productos de una categoría específica
-function cargarProductosDeCategoria(categoryId) {
-  // Realiza una solicitud para obtener los productos de la categoría seleccionada
-  fetch(
-    "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos",
-    requestOptions
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data); //datos de categoría consumidos de la API del web service
-      // Filtra los productos que pertenecen a la categoría seleccionada
-      const productosDeCategoria = data.filter(
-        (product) => product.TCAT_ID === categoryId
-      );
-
-      // Limpia el contenedor actual de tarjetas de productos
-      cardsContainer.innerHTML = "";
-
-      // Itera sobre los productos de la categoría y crea tarjetas
-      productosDeCategoria.forEach((product) => {
-        const fileName = product.productoUrl.split("/").pop();
-
-        const card = document.createElement("div");
-        card.className = "col-lg-4 col-md-6 col-sm-12";
-
-        card.innerHTML = cardTemplate(product, fileName);
-
-        cardsContainer.appendChild(card);
-      });
-    })
-    .catch((error) => {
-      console.error("Error al obtener los productos de la categoría:", error);
-    });
 }
 
 function createCategoryButton(category) {
@@ -133,33 +110,51 @@ function createCategoryButton(category) {
   return categoryButton;
 }
 
+function cargarProductosDeCategoria(categoryId) {
+  // Realiza una solicitud para obtener los productos desde la API
+  fetch("https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos", 
+  requestOptions)
+    .then((response) => response.json())
+    .then((productos) => {
+      console.log(productos);
 
-fetch(
-  "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesCategoria",
-  requestOptions
-)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    console.log(data); //datos de categoría consumidos de la API del web service
-    // Iterar sobre los datos de categoría y crear botones
-    data.forEach((category) => {
-      const categoryButton = createCategoryButton(category);
-      categoriesContainer.appendChild(categoryButton);
+      // Si categoryId es null o undefined, mostrar todos los productos
+      if (categoryId === null || categoryId === undefined) {
+        // Mostrar todos los productos
+        productos.forEach((product) => {
+          // Crea y agrega las tarjetas de producto como se hacía antes
+          const fileName = product.productoUrl.split("/").pop();
+          const card = document.createElement("div");
+          card.className = "col-lg-4 col-md-6 col-sm-12";
+          card.innerHTML = cardTemplate(product, fileName);
+          cardsContainer.appendChild(card);
+        });
+      } else {
+        // Filtra los productos que pertenecen a la categoría seleccionada
+        const productosDeCategoria = productos.filter(
+          (product) => product.productoCategoria === categoryId
+        );
+
+        // Limpia el contenedor actual de tarjetas de productos
+        cardsContainer.innerHTML = "";
+
+        // Itera sobre los productos de la categoría y crea tarjetas
+        productosDeCategoria.forEach((product) => {
+          const fileName = product.productoUrl.split("/").pop();
+          const card = document.createElement("div");
+          card.className = "col-lg-4 col-md-6 col-sm-12";
+          card.innerHTML = cardTemplate(product, fileName);
+          cardsContainer.appendChild(card);
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error al obtener los productos:", error);
     });
-  })
-  .catch((error) => {
-    console.error("Error al obtener las categorías:", error);
-  });
-cargarProductosDeCategoria();
+}
 
 
 
-// Función para agregar un producto a la tabla de detalles
 function agregarDetalle(descripcion, precio) {
   // Verificar si el producto ya está en la tabla
   const productoExistente = productosEnTabla.find(
@@ -185,29 +180,18 @@ function agregarDetalle(descripcion, precio) {
   actualizarValores();
 }
 
+function agregarDetalleBarraBusqueda() {
+  const selectElement = document.getElementById("productos");
+  const selectedOption =
+    selectElement.options[selectElement.selectedIndex].text;
 
+  // Extraer la descripción y el precio de la opción seleccionada
+  const [descripcion, precio] = selectedOption.split(" - $");
 
-function agregarDetalleBarraBusqueda(descripcion, precio) {
-  const productoExistente = productosEnTabla.find(
-    (producto) => producto.descripcion === descripcion
-  );
+  // Llamar a la función agregarProductoATabla con la descripción y el precio
+  agregarProductoATabla(descripcion, parseFloat(precio));
 
-  if (productoExistente) {
-    // Si el producto ya existe, aumentar su cantidad en la tabla
-    productoExistente.cantidad++;
-    actualizarCantidadEnTabla(productoExistente);
-  } else {
-    // Si el producto no existe, agregarlo a la tabla
-    const producto = {
-      descripcion: descripcion,
-      precio: precio,
-      cantidad: 1,
-    };
-
-    productosEnTabla.push(producto);
-    agregarProductoATabla(producto);
-  }
-
+  // Actualizar otros valores si es necesario
   actualizarValores();
 }
 
@@ -243,24 +227,6 @@ function actualizarCantidadEnTabla(producto) {
       cantidadCell.textContent = producto.cantidad;
     }
   });
-}
-
-function disminuirCantidad(button) {
-  const cantidadCell = button.parentNode.nextElementSibling;
-  let cantidad = parseInt(cantidadCell.textContent);
-  if (cantidad > 1) {
-    cantidad--;
-    cantidadCell.textContent = cantidad;
-    actualizarValores();
-  }
-}
-
-function aumentarCantidad(button) {
-  const cantidadCell = button.parentNode.previousElementSibling;
-  let cantidad = parseInt(cantidadCell.textContent);
-  cantidad++;
-  cantidadCell.textContent = cantidad;
-  actualizarValores();
 }
 
 function actualizarValores() {
@@ -317,12 +283,7 @@ function actualizarValoresConPropina(propina) {
   ).textContent = `$${totalConIvaYPropina.toFixed(2)}`;
 }
 
-
-// Función para crear un botón de categoría
-
-
 function productoSelect() {
-  
   const productoPrecioBusqueda = document.getElementById(
     "productoPrecioBusqueda"
   );
