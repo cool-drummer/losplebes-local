@@ -1,6 +1,10 @@
 const cardsContainer = document.getElementById("cards-container");
-const categoriesContainer = document.getElementById("cards-categories-container");
-const productoPrecioBusqueda = document.getElementById("productoPrecioBusqueda");
+const categoriesContainer = document.getElementById(
+  "cards-categories-container"
+);
+const productoPrecioBusqueda = document.getElementById(
+  "productoPrecioBusqueda"
+);
 const requestOptions = {
   method: "POST",
   headers: {
@@ -15,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
   barraBusquedaConsumo();
   cargarCategorias(); // Cargar categorías al inicio
   cargarProductosDeCategoria(null); // Cargar todos los productos al inicio
-
 });
 
 fetch(
@@ -29,7 +32,7 @@ fetch(
     return response.json();
   })
   .then((data) => {
-    console.log(data); 
+    console.log(data);
     data.forEach((category) => {
       const categoryButton = createCategoryButton(category);
       categoriesContainer.appendChild(categoryButton);
@@ -39,7 +42,6 @@ fetch(
     console.error("Error al obtener las categorías:", error);
   });
 cargarProductosDeCategoria();
-
 
 function barraBusquedaConsumo() {
   fetch(
@@ -56,18 +58,45 @@ function barraBusquedaConsumo() {
       console.log(data);
 
       const datalist = document.getElementById("productos");
-      datalist.innerHTML = ""; // Limpia el datalist
-
-      // Itera sobre los productos y agrega opciones al datalist
+      datalist.innerHTML = "";
       data.forEach((product) => {
         const option = document.createElement("option");
         option.value = `${product.productoNombre} - ${product.productoPrecio}`;
         datalist.appendChild(option);
       });
+
+      // Agregar un evento input a la barra de búsqueda para filtrar productos en cards
+      const barraBusqueda = document.getElementById("productoPrecioBusqueda");
+      barraBusqueda.addEventListener("input", filtrarProductosEnCards);
     })
     .catch((error) => {
       console.error("Error al obtener los productos:", error);
     });
+}
+
+function filtrarProductosEnCards() {
+  const barraBusqueda = document.getElementById("productoPrecioBusqueda");
+  const valorBusqueda = barraBusqueda.value.toLowerCase();
+
+  const cards = document.querySelectorAll(".card-producto");
+  cards.forEach((card) => {
+    const nombreProducto = card
+      .querySelector(".nombre-producto")
+      .textContent.toLowerCase();
+    const categoriaProducto = card
+      .querySelector(".categoria-producto")
+      .textContent.toLowerCase();
+
+    // Comprueba si el nombre del producto o la categoría coinciden con la búsqueda
+    if (
+      nombreProducto.includes(valorBusqueda) ||
+      categoriaProducto.includes(valorBusqueda)
+    ) {
+      card.style.display = "block"; // Muestra el card si coincide
+    } else {
+      card.style.display = "none"; // Oculta el card si no coincide
+    }
+  });
 }
 
 function cardTemplate(product, fileName) {
@@ -112,8 +141,10 @@ function createCategoryButton(category) {
 
 function cargarProductosDeCategoria(categoryId) {
   // Realiza una solicitud para obtener los productos desde la API
-  fetch("https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos", 
-  requestOptions)
+  fetch(
+    "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos",
+    requestOptions
+  )
     .then((response) => response.json())
     .then((productos) => {
       console.log(productos);
@@ -153,9 +184,7 @@ function cargarProductosDeCategoria(categoryId) {
     });
 }
 
-
-
-function agregarDetalle(descripcion, precio) {
+function agregarDetalle(descripcion, precio, esPropina = false) {
   // Verificar si el producto ya está en la tabla
   const productoExistente = productosEnTabla.find(
     (producto) => producto.descripcion === descripcion
@@ -177,25 +206,14 @@ function agregarDetalle(descripcion, precio) {
     agregarProductoATabla(producto);
   }
 
-  actualizarValores();
+  // Si es una propina, actualiza el total de la tabla
+  if (esPropina) {
+    actualizarValoresConPropina(precio);
+  } else {
+    actualizarValores();
+  }
 }
 
-function agregarDetalleBarraBusqueda() {
-  const selectElement = document.getElementById("productos");
-  const selectedOption =
-    selectElement.options[selectElement.selectedIndex].text;
-
-  // Extraer la descripción y el precio de la opción seleccionada
-  const [descripcion, precio] = selectedOption.split(" - $");
-
-  // Llamar a la función agregarProductoATabla con la descripción y el precio
-  agregarProductoATabla(descripcion, parseFloat(precio));
-
-  // Actualizar otros valores si es necesario
-  actualizarValores();
-}
-
-// Función para agregar un producto a la tabla de detalles
 function agregarProductoATabla(producto) {
   // Obtener la tabla y el cuerpo de la tabla
   const detalleProducto = document.getElementById("detalleProducto");
@@ -207,15 +225,52 @@ function agregarProductoATabla(producto) {
   // Crear celdas para descripción, precio, cantidad y botones de aumentar/disminuir
   const descripcionCell = newRow.insertCell(0);
   const precioCell = newRow.insertCell(1);
-  const cantidadCell = newRow.insertCell(2);
 
   // Asignar valores a las celdas
   descripcionCell.textContent = producto.descripcion;
   precioCell.textContent = `$${producto.precio}`;
+
+  // Agregar los botones de aumentar y disminuir cantidad a la fila de la tabla
+  const aumentarCantidadBtn = document.createElement("button");
+  aumentarCantidadBtn.textContent = "+";
+  aumentarCantidadBtn.classList.add("btn-cantidad");
+  aumentarCantidadBtn.addEventListener("click", () => aumentarCantidad(producto));
+
+  const disminuirCantidadBtn = document.createElement("button");
+  disminuirCantidadBtn.textContent = "-";
+  disminuirCantidadBtn.classList.add("btn-cantidad");
+  disminuirCantidadBtn.addEventListener("click", () => disminuirCantidad(producto));
+
+  const cantidadCell = newRow.insertCell(2); // Celda de cantidad
   cantidadCell.textContent = producto.cantidad;
+  cantidadCell.classList.add("cantidad-cell");
+
+  const aumentarCantidadCell = newRow.insertCell(3); // Celda de aumento
+  aumentarCantidadCell.appendChild(aumentarCantidadBtn);
+
+  const disminuirCantidadCell = newRow.insertCell(4); // Celda de disminución
+  disminuirCantidadCell.appendChild(disminuirCantidadBtn);
 
   newRow.dataset.descripcion = producto.descripcion; // Almacena la descripción como atributo personalizado
 }
+
+
+
+function aumentarCantidad(producto) {
+  producto.cantidad++;
+  actualizarCantidadEnTabla(producto);
+  actualizarValores();
+}
+
+function disminuirCantidad(producto) {
+  if (producto.cantidad > 1) {
+    producto.cantidad--;
+    actualizarCantidadEnTabla(producto);
+    actualizarValores();
+  }
+}
+
+
 
 // Función para actualizar la cantidad en la tabla de detalles
 function actualizarCantidadEnTabla(producto) {
@@ -230,7 +285,6 @@ function actualizarCantidadEnTabla(producto) {
 }
 
 function actualizarValores() {
-  // Actualizar el subtotal, IVA y total
   subtotal = 0;
   const filas = document.querySelectorAll("#detalleProducto tbody tr");
   filas.forEach((fila) => {
@@ -252,17 +306,21 @@ const propinaInput = document.getElementById("propinaInput");
 const totalPropinaSpan = document.getElementById("totalPropina");
 
 // Función para calcular la propina y actualizar los valores
-function addPropina() {
-  $("#modalPropina").modal("show");
-  document.getElementById("montoPropina").focus(); //totalG
-  // Obtén el valor de la propina ingresado por el usuario
-  const propina = parseFloat(propinaInput.value);
 
-  // Actualiza el span que muestra la propina
-  totalPropinaSpan.textContent = `$${propina.toFixed(2)}`;
+function agregarPropina() {
+  const montoPropinaInput = document.getElementById("montoPropina");
+  const montoPropina = parseFloat(montoPropinaInput.value) || 0; // Obtener el monto de propina ingresado
 
-  // Actualiza los valores de subtotal, IVA y total incluyendo la propina
-  actualizarValoresConPropina(propina);
+  if (montoPropina > 0) {
+    // Agregar la propina a la tabla
+    agregarDetalle("Propina", montoPropina, true);
+
+    // Cierra el modal de propina
+    $("#modalPropina").modal("hide");
+
+    // Limpia el campo de monto de propina
+    montoPropinaInput.value = "";
+  }
 }
 
 // Función para actualizar los valores incluyendo la propina
@@ -287,34 +345,17 @@ function productoSelect() {
   const productoPrecioBusqueda = document.getElementById(
     "productoPrecioBusqueda"
   );
-  console.log(productoPrecioBusqueda);
   const productoSeleccionado = productoPrecioBusqueda.value;
 
-  // Expresión regular para buscar el precio
-  const regex = / -\$ (\d+)/;
-  const match = productoSeleccionado.match(regex);
+  // Dividir el valor en descripción y precio utilizando el formato " - "
+  const [descripcion, precio] = productoSeleccionado.split(" - ");
 
-  if (match) {
-    // El precio se encuentra en match[1]
-
-    const precio = match[1];
-    console.log("Precio:", precio);
-
-    document.getElementById(
-      "productoPrecioBusqueda"
-    ).textContent = `Precio: $${precio}`;
+  if (descripcion && precio) {
+    // Llamar a la función agregarDetalle con la descripción y el precio
+    agregarDetalle(descripcion, parseFloat(precio));
   } else {
-    document.getElementById("productoPrecioBusqueda").textContent =
-      "Precio no encontrado en la cadena.";
+    console.error(
+      "No se pudo obtener la descripción y el precio del producto seleccionado."
+    );
   }
-  console.log(precio);
-}
-
-function obtenerPrecio(valor) {
-  console.log("----nn1" + valor);
-  var arrayDeCadenas = valor.split("..-");
-  const textos = arrayDeCadenas[0];
-  console.log(textos);
-  //document.getElementById('barraBusqueda');
-  //console.log(document.getElementById('barraBusqueda').value);
 }

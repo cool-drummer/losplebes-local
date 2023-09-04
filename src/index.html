@@ -290,27 +290,19 @@
 
         <!--codigo bueno-->
         <div class="container-fluid">
-
-
-
             <div class="row">
-
-
                 <div class="col-lg-12 justify-content-center">
                     <center><object data="./assets/img/logo.svg" width="500" height="200"></object></center>
                 </div>
-
                 <div class="row mb-3 mt-3 ">
                     <div class="col-md-12">
                         <div class="col-md-7">
                             <input type="text" id="productoPrecioBusqueda" class="barra-busqueda form-control"
                                 autocomplete="off" list="productos" placeholder="Buscar..."
-                                onchange="agregarDetalleBarraBusqueda(this.value)">
+                                oninput="filtrarProductos(this.value)" onchange="productoSelect(this.value)">
                             <datalist id="productos">
                                 <select>
-
                                 </select>
-
                             </datalist>
                         </div>
                     </div>
@@ -341,10 +333,10 @@
                                             onclick="limpiarVentana()">
                                             Limpiar
                                         </button>
-                                        <button type="button" class="btn btn-danger ml-2 mt-2" id="propina"
-                                            onclick="addPropina()">
+                                        <button type="button" class="btn btn-danger ml-2 mt-2" id="propina" data-toggle="modal" data-target="#modalPropina">
                                             Propina: &nbsp; <span id="totalPropina">0</span>
-                                        </button>
+                                          </button>
+                                          
 
 
 
@@ -476,11 +468,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
             </div>
         </div>
 
@@ -676,6 +663,7 @@
 
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-primary" onclick="agregarPropina()">Aceptar</button>
+
                     </div>
                 </div>
             </div>
@@ -1025,7 +1013,21 @@
         }
         function limpiarVentana() {
             location.reload();
-        }           
+        }
+
+        function addPropina() {
+            $("#modalPropina").modal("show");
+            document.getElementById("montoPropina").focus(); //totalG
+            // Obtén el valor de la propina ingresado por el usuario
+            const propina = parseFloat(propinaInput.value);
+
+            // Actualiza el span que muestra la propina
+            totalPropinaSpan.textContent = `$${propina.toFixed(2)}`;
+
+            // Actualiza los valores de subtotal, IVA y total incluyendo la propina
+            actualizarValoresConPropina(propina);
+        }
+
     </script>
     <script src="interface/js/index.js"></script>
     <script src="interface/js/productos.js"></script>
