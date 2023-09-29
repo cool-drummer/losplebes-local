@@ -13,7 +13,7 @@ const createWindow = () => {
     }
   })
 
-  mainWindow.loadFile('src/index.html')
+  mainWindow.loadFile('src/aperturaCaja.html')
 
 }
 app.whenReady().then(() => {

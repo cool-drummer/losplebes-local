@@ -300,8 +300,8 @@ function enviarSolicitud(url) {
 }
 
 function comunica(data) {
-  var urlform = "10.81.44.131"; //document.getElementById("urlform").value;
-  var impresora = "impreso"; // document.getElementById("impresora").value;
+  var urlform = "10.81.44.131"; 
+  var impresora = "impreso"; 
   console.log("data:" + data);
   let data1 =
     '{ "n_impresora":"' +
@@ -507,9 +507,7 @@ function usarD(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) {
 
 function cobrarAntes() {
   $("#aceptaVenta").modal("show");
-
   let maxTabla = cuerpoTabla.rows.length;
-
   let mixtabla = document.getElementById("tablaSolicitud");
   mixtabla.innerHTML = "";
   mixtabla.innerHTML += `<table class="table">
@@ -525,7 +523,6 @@ function cobrarAntes() {
       let cantidadF = cuerpoTabla.rows[i].cells[1].innerText;
       let descProducto = cuerpoTabla.rows[i].cells[3].innerText;
 
-      // mixtabla.innerHTML+=cantidadF+'-'+descProducto;
       mixtabla.innerHTML += `<tr>
                 <th scope="row">${cantidadF} - </th>
                 <td>${descProducto}</td> 

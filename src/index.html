@@ -13,274 +13,6 @@
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
 
 
-
-    <style>
-        .bg-dark2 {
-            background-color: #1c2f3c !important;
-        }
-
-        .bg-gradient-primary-to-secondary2 {
-            background-color: #0061f2;
-
-            background-image: linear-gradient(135deg, #4bb1b6 0%, rgba(80, 177, 178, 0.8) 100%);
-        }
-
-        .btn-secondary2 {
-            color: #fff;
-            background-color: #154771;
-            border-color: #154771;
-        }
-
-        .btn-danger2 {
-            color: #fff;
-            background-color: #f68c17;
-            border-color: #f69a16;
-        }
-
-        .bg-gradient-primary-to-secondary3 {
-            background-color: #eb9585;
-            background-image: linear-gradient(135deg, #faf8ec 0%, rgb(250 248 236) 100%);
-        }
-
-        .btnProductos {
-            display: none;
-        }
-
-
-
-
-
-
-        @media (max-width: 750px) {
-            #ssmenu {
-                display: none;
-            }
-
-            .btnProductos {
-                display: block;
-            }
-
-            #conR {
-                margin-top: 6rem !important;
-                height: 80px;
-                width: 1100px;
-                overflow-x: auto !important;
-                display: inline-block !important;
-            }
-
-            #conR2 {
-
-                height: 330px;
-                width: 2100px;
-                overflow-x: auto !important;
-                display: inline-block !important;
-            }
-
-            .card .card-header {
-                display: inline-block !important;
-            }
-
-            .card .card-body {
-                display: inline-block !important;
-            }
-
-            .container,
-            .container-fluid,
-            .container-sm,
-            .container-md,
-            .container-lg,
-            .container-xl {
-                padding-left: 0rem;
-                padding-right: 0rem;
-            }
-
-            .btn-secondary2 {
-                font-size: larger;
-            }
-
-            .responsiveCard {
-                width: 120px;
-                font-size: xx-small;
-                font-weight: bold;
-
-
-
-
-            }
-
-            .card-header:first-child {
-                border-radius: 0rem;
-            }
-
-            ::-webkit-scrollbar {
-                display: none;
-
-            }
-
-
-
-        }
-
-
-        .category-button {
-            margin: 4px;
-            background-color: #3D5BA6;
-            width: 160px;
-            height: 50px;
-
-        }
-
-        .button {}
-
-
-
-        .efectoclick {
-            box-shadow: 0 0 10px #0061f2;
-            transition: box-shadow 0.3s;
-        }
-
-
-
-
-        #cards-container {
-            max-height: 1000px;
-            border: 2px solid #154771;
-            border-radius: 8px;
-            background-color: #fff;
-            /* Porcentaje de la altura de la ventana */
-        }
-
-        .barra-busqueda {
-            border: 2px solid #154771;
-            border-radius: 19px;
-        }
-
-        .ventana-venta {
-            border: 2px solid #154771;
-            border-radius: 19px;
-            margin: 7px;
-        }
-
-        .card-producto {
-            border: 2px solid #154771;
-            border-radius: 19px;
-
-        }
-
-        .row.d-flex.flex-wrap.overflow-auto.cards-container {
-            height: 1000px;
-            border: 2px solid #154771;
-            margin: 10px;
-            /* Puedes ajustar el grosor y el color del borde según tus preferencias */
-        }
-
-        .col-lg-4.col-md-6.col-sm-12 {
-            margin-top: 15px;
-        }
-
-        .card-producto {
-            border: 1px solid #154771;
-            border-radius: 19px;
-            margin: 2px;
-
-        }
-
-        .card-product-content {
-            background-color: #EC644E;
-            font-style: normal;
-            padding: 10px;
-
-        }
-
-        .nombre-producto {
-            color: #fff;
-            font-weight: 700;
-            font-size: large;
-        }
-
-        .precio-producto {
-            background-color: #fff;
-            border-radius: 19px;
-            height: 60px;
-            padding-top: 10px;
-            font-weight: 500;
-            font-size: large;
-        }
-
-        #entrega,
-        #cliente {
-            border: 1px solid #154771;
-            border-radius: 19px;
-        }
-
-        /* Estilo para el scrollbar en navegadores Webkit (Chrome, Safari, Edge) */
-        ::-webkit-scrollbar {
-            width: 12px;
-            /* Ancho del scrollbar vertical */
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: #888;
-            /* Color del thumb (la parte desplazable del scrollbar) */
-            border-radius: 6px;
-            /* Bordes redondeados del thumb */
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #555;
-            /* Cambiar el color cuando se pasa el mouse por encima */
-        }
-
-        /* Estilo para el scrollbar en navegadores Firefox */
-        /* Ten en cuenta que Firefox utiliza una pseudo-clase diferente */
-        /* para el thumb (::-webkit-scrollbar-thumb) */
-
-        /* Color thumb / color fondo scrollbar */
-
-        /* Cambiar el color cuando se pasa el mouse por encima */
-        /* Esto solo funciona en Firefox 64 y versiones posteriores */
-        /* Puede no ser necesario en versiones más recientes de Firefox */
-        * {
-            scrollbar-track-color: #f5f5f5;
-            scrollbar-face-color: #888;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: #f5f5f5;
-            /* Color del fondo del scrollbar */
-        }
-
-        datalist {
-            position: absolute;
-            max-height: 20em;
-            border: 0 none;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        datalist option {
-            font-size: 0.8em;
-            padding: 0.3em 1em;
-            background-color: #ccc;
-            cursor: pointer;
-        }
-
-        /* option active styles */
-        datalist option:hover,
-        datalist option:focus {
-            color: #fff;
-            background-color: #036;
-            outline: 0 none;
-        }
-
-        #browserdata option {
-            font-size: 1.8em;
-            padding: 0.3em 1em;
-            background-color: #ccc;
-            cursor: pointer;
-        }
-    </style>
-
 </head>
 
 <body class="nav-fixed" onload="turnoActivo();">
@@ -333,10 +65,11 @@
                                             onclick="limpiarVentana()">
                                             Limpiar
                                         </button>
-                                        <button type="button" class="btn btn-danger ml-2 mt-2" id="propina" data-toggle="modal" data-target="#modalPropina">
+                                        <button type="button" class="btn btn-danger ml-2 mt-2" id="propina"
+                                            data-toggle="modal" data-target="#modalPropina">
                                             Propina: &nbsp; <span id="totalPropina">0</span>
-                                          </button>
-                                          
+                                        </button>
+
 
 
 
@@ -459,8 +192,10 @@
 
 
                                     <button class="btn btn-danger btn-block" id="btntot"
-                                        style="height: 80px; font-size: 20px;" onclick="cobrarAntes()"> Total $<div
-                                            style="width: auto;" id="totalG">0.00</div>
+                                        style="height: 80px; font-size: 20px;" data-toggle="modal"
+                                        data-target="#aceptaVenta" onclick="realizarPedido()">Total $<div
+                                            style="width: auto;" id="totalG">0.00
+                                        </div>
                                     </button>
                                 </div>
 
@@ -836,6 +571,80 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modalCobro" tabindex="-1" role="dialog" aria-labelledby="pagoTitulo"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <label class="modal-title text-white display-4">
+                            <div id="pagoTitulo"></div>
+                        </label>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group text-center">
+                            <p class="h1 text-center">Su pago</p>
+                            <input onkeyup="cambio()" class="form-control text-center display-4 lg"
+                                aria-describedby="inputGroup-sizing-sm" id="pagoRecibido" type="number" placeholder="$"
+                                autofocus="true" min="1">
+                            <span style="color: red; display: none" id="cantidadInv">No puede ser menor al total</span>
+                        </div>
+                        <div class="form-group text-center">
+                            <p class="h1 text-center">Cambio</p>
+                            <span class="text-center display-4" id="cambio"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnP" style="display: none;"
+                            onclick="setOV()">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="aceptaVenta" tabindex="-1" role="dialog" aria-labelledby="aceptaVentaLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="aceptaVentaLabel">Confirmar Pedido</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Tabla de detalles del pedido -->
+                        <table class="table" id="tablaSolicitud">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Aquí se mostrarán los detalles del pedido -->
+                            </tbody>
+                        </table>
+
+                        <!-- Resumen del pedido -->
+                        <table class="table">
+                            <tbody id="resumenPedido">
+                                <!-- Aquí aparecerá el resumen del pedido como filas adicionales -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="realizarPedido()">Confirmar
+                            Pedido</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
 
         <div class="modal" id="preparadoProductos" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -859,38 +668,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-        <div class="modal" id="aceptaVenta" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Revisa la solicitud </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div id="tablaSolicitud">j</div>
-                    </div>
-
-                    <div class="modal-footer">
-
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-primary" onclick="cobrar()">Aceptar</button>
-
-                    </div>
-
-
-
-                </div>
-            </div>
-        </div>
-
-
 
         <div class="modal" id="modalPrep" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -930,37 +707,7 @@
         <input type="hidden" id="tipoP" value="0">
 
 
-        <!-- Modal cobro -->
-        <div class="modal fade" id="modalCobro" tabindex="-1" role="dialog" aria-labelledby="pagoTitulo"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary">
-                        <label class="modal-title text-white display-4">
-                            <div id="pagoTitulo"></div>
-                        </label>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group text-center">
-                            <p class="h1 text-center">Su pago</p>
-                            <input onkeyup="cambio()" class="form-control text-center display-4 lg"
-                                aria-describedby="inputGroup-sizing-sm" id="pagoRecibido" type="number" placeholder="$"
-                                autofocus="true" min="1">
-                            <spam style="color: red; display: none" id="cantidadInv">No puede ser menor al total
-                            </spam>
-                        </div>
-                        <div class="form-group text-center">
-                            <p class="h1 text-center">Cambio</p>
-                            <span class="text-center display-4" id="cambio"> </span>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="btnP" style="display: none;"
-                            onclick="setOV()">Aceptar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
     </section>
     <script src="interface/js/venta.js"></script>
@@ -972,8 +719,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="interface/js/venta.js"></script>
     <script>
-
-
         $(document).ready(function (e) {
             // Cierra el modal cuando se hace clic fuera de él
             $('#mesaDis').click(function (e) {

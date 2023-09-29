@@ -11,14 +11,15 @@ const requestOptions = {
     "Content-Type": "application/json",
   },
 };
+
 const ivaPorcentaje = 0.16;
 const productosEnTabla = [];
 let subtotal = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
   barraBusquedaConsumo();
-  cargarCategorias(); // Cargar categorías al inicio
-  cargarProductosDeCategoria(null); // Cargar todos los productos al inicio
+  cargarProductosDeCategoria(null);
+
 });
 
 fetch(
@@ -32,7 +33,6 @@ fetch(
     return response.json();
   })
   .then((data) => {
-    console.log(data);
     data.forEach((category) => {
       const categoryButton = createCategoryButton(category);
       categoriesContainer.appendChild(categoryButton);
@@ -55,8 +55,6 @@ function barraBusquedaConsumo() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
-
       const datalist = document.getElementById("productos");
       datalist.innerHTML = "";
       data.forEach((product) => {
@@ -87,14 +85,13 @@ function filtrarProductosEnCards() {
       .querySelector(".categoria-producto")
       .textContent.toLowerCase();
 
-    // Comprueba si el nombre del producto o la categoría coinciden con la búsqueda
     if (
       nombreProducto.includes(valorBusqueda) ||
       categoriaProducto.includes(valorBusqueda)
     ) {
-      card.style.display = "block"; // Muestra el card si coincide
+      card.style.display = "block";
     } else {
-      card.style.display = "none"; // Oculta el card si no coincide
+      card.style.display = "none";
     }
   });
 }
@@ -131,8 +128,7 @@ function createCategoryButton(category) {
 
   categoryButton.addEventListener("click", () => {
     console.log(`Categoría seleccionada: ${categoryDescription}`);
-    // Aquí puedes realizar acciones cuando se hace clic en una categoría.
-    // Por ejemplo, cargar productos de esta categoría.
+
     cargarProductosDeCategoria(categoryId);
   });
 
@@ -140,36 +136,27 @@ function createCategoryButton(category) {
 }
 
 function cargarProductosDeCategoria(categoryId) {
-  // Realiza una solicitud para obtener los productos desde la API
   fetch(
     "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos",
     requestOptions
   )
     .then((response) => response.json())
     .then((productos) => {
-      console.log(productos);
-
-      // Si categoryId es null o undefined, mostrar todos los productos
       if (categoryId === null || categoryId === undefined) {
-        // Mostrar todos los productos
         productos.forEach((product) => {
-          // Crea y agrega las tarjetas de producto como se hacía antes
           const fileName = product.productoUrl.split("/").pop();
           const card = document.createElement("div");
-          card.className = "col-lg-4 col-md-6 col-sm-12";
+          card.className = "col-lg-3 col-md-6 col-sm-12";
           card.innerHTML = cardTemplate(product, fileName);
           cardsContainer.appendChild(card);
         });
       } else {
-        // Filtra los productos que pertenecen a la categoría seleccionada
         const productosDeCategoria = productos.filter(
           (product) => product.productoCategoria === categoryId
         );
 
-        // Limpia el contenedor actual de tarjetas de productos
         cardsContainer.innerHTML = "";
 
-        // Itera sobre los productos de la categoría y crea tarjetas
         productosDeCategoria.forEach((product) => {
           const fileName = product.productoUrl.split("/").pop();
           const card = document.createElement("div");
@@ -185,17 +172,14 @@ function cargarProductosDeCategoria(categoryId) {
 }
 
 function agregarDetalle(descripcion, precio, esPropina = false) {
-  // Verificar si el producto ya está en la tabla
   const productoExistente = productosEnTabla.find(
     (producto) => producto.descripcion === descripcion
   );
 
   if (productoExistente) {
-    // Si el producto ya existe, aumentar su cantidad en la tabla
     productoExistente.cantidad++;
     actualizarCantidadEnTabla(productoExistente);
   } else {
-    // Si el producto no existe, agregarlo a la tabla
     const producto = {
       descripcion: descripcion,
       precio: precio,
@@ -206,7 +190,6 @@ function agregarDetalle(descripcion, precio, esPropina = false) {
     agregarProductoATabla(producto);
   }
 
-  // Si es una propina, actualiza el total de la tabla
   if (esPropina) {
     actualizarValoresConPropina(precio);
   } else {
@@ -215,46 +198,43 @@ function agregarDetalle(descripcion, precio, esPropina = false) {
 }
 
 function agregarProductoATabla(producto) {
-  // Obtener la tabla y el cuerpo de la tabla
   const detalleProducto = document.getElementById("detalleProducto");
   const tbody = detalleProducto.querySelector("tbody");
 
-  // Crear una nueva fila
   const newRow = tbody.insertRow();
 
-  // Crear celdas para descripción, precio, cantidad y botones de aumentar/disminuir
   const descripcionCell = newRow.insertCell(0);
   const precioCell = newRow.insertCell(1);
 
-  // Asignar valores a las celdas
   descripcionCell.textContent = producto.descripcion;
   precioCell.textContent = `$${producto.precio}`;
 
-  // Agregar los botones de aumentar y disminuir cantidad a la fila de la tabla
   const aumentarCantidadBtn = document.createElement("button");
   aumentarCantidadBtn.textContent = "+";
   aumentarCantidadBtn.classList.add("btn-cantidad");
-  aumentarCantidadBtn.addEventListener("click", () => aumentarCantidad(producto));
+  aumentarCantidadBtn.addEventListener("click", () =>
+    aumentarCantidad(producto)
+  );
 
   const disminuirCantidadBtn = document.createElement("button");
   disminuirCantidadBtn.textContent = "-";
   disminuirCantidadBtn.classList.add("btn-cantidad");
-  disminuirCantidadBtn.addEventListener("click", () => disminuirCantidad(producto));
+  disminuirCantidadBtn.addEventListener("click", () =>
+    disminuirCantidad(producto)
+  );
 
-  const cantidadCell = newRow.insertCell(2); // Celda de cantidad
+  const cantidadCell = newRow.insertCell(2);
   cantidadCell.textContent = producto.cantidad;
   cantidadCell.classList.add("cantidad-cell");
 
-  const aumentarCantidadCell = newRow.insertCell(3); // Celda de aumento
+  const aumentarCantidadCell = newRow.insertCell(3);
   aumentarCantidadCell.appendChild(aumentarCantidadBtn);
 
-  const disminuirCantidadCell = newRow.insertCell(4); // Celda de disminución
+  const disminuirCantidadCell = newRow.insertCell(4);
   disminuirCantidadCell.appendChild(disminuirCantidadBtn);
 
-  newRow.dataset.descripcion = producto.descripcion; // Almacena la descripción como atributo personalizado
+  newRow.dataset.descripcion = producto.descripcion;
 }
-
-
 
 function aumentarCantidad(producto) {
   producto.cantidad++;
@@ -270,11 +250,7 @@ function disminuirCantidad(producto) {
   }
 }
 
-
-
-// Función para actualizar la cantidad en la tabla de detalles
 function actualizarCantidadEnTabla(producto) {
-  // Buscar la fila correspondiente al producto por su descripción
   const filas = document.querySelectorAll("#detalleProducto tbody tr");
   filas.forEach((fila) => {
     if (fila.dataset.descripcion === producto.descripcion) {
@@ -305,17 +281,13 @@ function actualizarValores() {
 const propinaInput = document.getElementById("propinaInput");
 const totalPropinaSpan = document.getElementById("totalPropina");
 
-// Función para calcular la propina y actualizar los valores
-
 function agregarPropina() {
   const montoPropinaInput = document.getElementById("montoPropina");
-  const montoPropina = parseFloat(montoPropinaInput.value) || 0; // Obtener el monto de propina ingresado
+  const montoPropina = parseFloat(montoPropinaInput.value) || 0;
 
   if (montoPropina > 0) {
-    // Agregar la propina a la tabla
     agregarDetalle("Propina", montoPropina, true);
 
-    // Cierra el modal de propina
     $("#modalPropina").modal("hide");
 
     // Limpia el campo de monto de propina
@@ -357,5 +329,230 @@ function productoSelect() {
     console.error(
       "No se pudo obtener la descripción y el precio del producto seleccionado."
     );
+  }
+}
+
+function llenarTablaConfirmacion() {
+  const confirmOrderTableBody = document.getElementById(
+    "confirmOrderTableBody"
+  );
+  confirmOrderTableBody.innerHTML = ""; // Limpia la tabla
+
+  productosEnTabla.forEach((producto) => {
+    const newRow = confirmOrderTableBody.insertRow();
+    newRow.innerHTML = `
+      <td>${producto.descripcion}</td>
+      <td>$${producto.precio.toFixed(2)}</td>
+      <td>${producto.cantidad}</td>
+      <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
+    `;
+  });
+
+  const confirmSubtotal = document.getElementById("confirmSubtotal");
+  const confirmIVA = document.getElementById("confirmIVA");
+  const confirmTotal = document.getElementById("confirmTotal");
+
+  confirmSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+  confirmIVA.textContent = `$${(subtotal * ivaPorcentaje).toFixed(2)}`;
+  confirmTotal.textContent = `$${(subtotal + subtotal * ivaPorcentaje).toFixed(
+    2
+  )}`;
+}
+
+$("#confirmOrderModal").on("show.bs.modal", function (e) {
+  llenarTablaConfirmacion();
+});
+
+// Función para construir la tabla de detalles en el modal
+function construirTablaDetalles() {
+  const tablaSolicitud = document.getElementById("tablaSolicitud");
+  tablaSolicitud.innerHTML = ""; // Limpia la tabla
+
+  const detalleProducto = document.getElementById("detalleProducto");
+  const filas = detalleProducto.querySelectorAll("tbody tr");
+
+  if (filas.length === 0) {
+    // No hay productos en la orden, muestra un mensaje
+    tablaSolicitud.textContent = "No hay productos en la orden.";
+  } else {
+    // Crea la tabla de detalles
+    const table = document.createElement("table");
+    table.className = "table";
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    // Crea la fila de encabezado de la tabla
+    const headerRow = document.createElement("tr");
+    const thDescripcion = document.createElement("th");
+    thDescripcion.textContent = "Descripción";
+    const thPrecio = document.createElement("th");
+    thPrecio.textContent = "Precio";
+    const thCantidad = document.createElement("th");
+    thCantidad.textContent = "Cantidad";
+    headerRow.appendChild(thDescripcion);
+    headerRow.appendChild(thPrecio);
+    headerRow.appendChild(thCantidad);
+    thead.appendChild(headerRow);
+
+    // Agrega filas a la tabla con los productos en la orden
+    filas.forEach((fila) => {
+      const descripcion = fila.cells[0].textContent;
+      const precio = fila.cells[1].textContent;
+      const cantidad = fila.cells[2].textContent;
+      const row = document.createElement("tr");
+      const tdDescripcion = document.createElement("td");
+      tdDescripcion.textContent = descripcion;
+      const tdPrecio = document.createElement("td");
+      tdPrecio.textContent = precio;
+      const tdCantidad = document.createElement("td");
+      tdCantidad.textContent = cantidad;
+      row.appendChild(tdDescripcion);
+      row.appendChild(tdPrecio);
+      row.appendChild(tdCantidad);
+      tbody.appendChild(row);
+    });
+
+    // Agrega la tabla al modal
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tablaSolicitud.appendChild(table);
+  }
+}
+
+// Ahora, actualiza la función realizarPedido para que también llame a construirTablaDetalles
+function realizarPedido() {
+  const metodoPago = document.getElementById("pagoTipo").textContent;
+  const mesaSeleccionada = document.getElementById("titulMesa").textContent;
+  const subtotal = parseFloat(
+    document.getElementById("subtotal").textContent.replace("$", "")
+  );
+  const iva = parseFloat(
+    document.getElementById("ivas").textContent.replace("$", "")
+  );
+  const total = parseFloat(
+    document.getElementById("totalG").textContent.replace("$", "")
+  );
+
+  const pedidoResumen = `
+    Método de Pago: ${metodoPago}
+    Mesa Seleccionada: ${mesaSeleccionada}
+    Subtotal: $${subtotal.toFixed(2)}
+    IVA: $${iva.toFixed(2)}
+    Total: $${total.toFixed(2)}
+  `;
+
+  // Actualiza el contenido del elemento "resumenPedido" en el modal
+  const resumenPedidoElement = document.getElementById("resumenPedido");
+  resumenPedidoElement.textContent = pedidoResumen;
+
+  // Llama a la función para construir la tabla de detalles en el modal
+  construirTablaDetalles();
+
+  // Abre o muestra el modal si no está abierto
+  $("#aceptaVenta").modal("show");
+}
+
+function realizarPedidoFinal() {
+  const tablaSolicitud = document.getElementById("tablaSolicitud");
+  const resumenPedido = document.getElementById("resumenPedido");
+
+  // Limpia la tabla de resumen antes de agregar los nuevos elementos
+  resumenPedido.innerHTML = "";
+
+  const filas = tablaSolicitud.querySelectorAll("tbody tr");
+  filas.forEach((fila) => {
+    const descripcion = fila.cells[0].textContent;
+    const precio = fila.cells[1].textContent;
+    const cantidad = fila.cells[2].textContent;
+
+    // Agrega una fila adicional en la tabla de resumen para cada producto
+    const row = document.createElement("tr");
+    const tdDescripcion = document.createElement("td");
+    tdDescripcion.textContent = descripcion;
+    const tdPrecio = document.createElement("td");
+    tdPrecio.textContent = precio;
+    const tdCantidad = document.createElement("td");
+    tdCantidad.textContent = cantidad;
+    row.appendChild(tdDescripcion);
+    row.appendChild(tdPrecio);
+    row.appendChild(tdCantidad);
+
+    resumenPedido.appendChild(row);
+  });
+
+  // Aquí puedes realizar cualquier otra lógica de procesamiento del pedido
+}
+
+function tpago() {
+  banderaTipoPago = !banderaTipoPago;
+  if (banderaTipoPago) {
+    btnTipoPago.innerHTML = `<i class="mr-2" aria-hidden="true">$</i> Efectivo`;
+  } else {
+    btnTipoPago.innerHTML = `<i class="fa fa-credit-card mr-2" aria-hidden="true"></i> Tarjeta`;
+  }
+}
+
+function cobrar() {
+  $("#aceptaVenta").modal("hide");
+  cobrarNormal();
+}
+
+
+
+function realizarPedido() {
+  // Aquí puedes realizar la lógica de procesamiento del pedido
+  // Construye una tabla con los detalles de la orden
+  const tablaSolicitud = document.getElementById("tablaSolicitud");
+  tablaSolicitud.innerHTML = ""; // Limpia la tabla
+
+  const detalleProducto = document.getElementById("detalleProducto");
+  const filas = detalleProducto.querySelectorAll("tbody tr");
+
+  if (filas.length === 0) {
+    tablaSolicitud.textContent = "No hay productos en la orden.";
+  } else {
+    // Crea la tabla de detalles
+    const table = document.createElement("table");
+    table.className = "table";
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    // Crea la fila de encabezado de la tabla
+    const headerRow = document.createElement("tr");
+    const thDescripcion = document.createElement("th");
+    thDescripcion.textContent = "Descripción";
+    const thPrecio = document.createElement("th");
+    thPrecio.textContent = "Precio";
+    const thCantidad = document.createElement("th");
+    thCantidad.textContent = "Cantidad";
+    headerRow.appendChild(thDescripcion);
+    headerRow.appendChild(thPrecio);
+    headerRow.appendChild(thCantidad);
+    thead.appendChild(headerRow);
+
+    // Agrega filas a la tabla con los productos en la orden
+    filas.forEach((fila) => {
+      const descripcion = fila.cells[0].textContent;
+      const precio = fila.cells[1].textContent;
+      const cantidad = fila.cells[2].textContent;
+
+      const row = document.createElement("tr");
+      const tdDescripcion = document.createElement("td");
+      tdDescripcion.textContent = descripcion;
+      const tdPrecio = document.createElement("td");
+      tdPrecio.textContent = precio;
+      const tdCantidad = document.createElement("td");
+      tdCantidad.textContent = cantidad;
+
+      row.appendChild(tdDescripcion);
+      row.appendChild(tdPrecio);
+      row.appendChild(tdCantidad);
+      tbody.appendChild(row);
+    });
+
+    // Agrega la tabla al modal
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tablaSolicitud.appendChild(table);
   }
 }
