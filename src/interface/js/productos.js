@@ -6,7 +6,7 @@ const productoPrecioBusqueda = document.getElementById(
   "productoPrecioBusqueda"
 );
 const requestOptions = {
-  method: "POST",
+  method: "GET",
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,13 +19,9 @@ let subtotal = 0;
 document.addEventListener("DOMContentLoaded", function () {
   barraBusquedaConsumo();
   cargarProductosDeCategoria(null);
-
 });
 
-fetch(
-  "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesCategoria",
-  requestOptions
-)
+fetch("http://localhost:3008/categorias", requestOptions)
   .then((response) => {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -33,6 +29,7 @@ fetch(
     return response.json();
   })
   .then((data) => {
+    console.log(data[0]);
     data.forEach((category) => {
       const categoryButton = createCategoryButton(category);
       categoriesContainer.appendChild(categoryButton);
@@ -41,13 +38,11 @@ fetch(
   .catch((error) => {
     console.error("Error al obtener las categorías:", error);
   });
+
 cargarProductosDeCategoria();
 
 function barraBusquedaConsumo() {
-  fetch(
-    "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos",
-    requestOptions
-  )
+  fetch("http://localhost:3008/productos", requestOptions)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -96,30 +91,25 @@ function filtrarProductosEnCards() {
   });
 }
 
-function cardTemplate(product, fileName) {
-  const imageUrl = `https://www.ta2.mx/imgPlebes/${fileName}`;
-  const imageTag = new Image();
-  imageTag.onerror = function () {
-    //this.src = "../../assets/img/error_picture.jpg";
-  };
-
-  imageTag.src = imageUrl;
+function cardTemplate(product) {
+  // Utiliza la URL de la imagen directamente desde la base de datos
+  const imageUrl = product.productoUrl;
 
   return `
   <div class="card-producto card" onclick="agregarDetalle('${product.productoNombre}', '${product.productoPrecio}')">
     <img src="${imageUrl}" class="card-img-top" style="height:300px" alt="Producto Imagen">
     <div class="card-product-content card-body">
-      <p class="nombre-producto">${product.productoCategoria}</p>
+      <p class="categoria-producto">${product.productoCategoria}</p>
       <p class="nombre-producto">${product.productoNombre}</p>
       <p class="precio-producto card-text">$${product.productoPrecio}</p>
     </div>
-</div>
+  </div>
   `;
 }
 
 function createCategoryButton(category) {
-  const categoryId = category.TCAT_ID;
-  const categoryDescription = category.TCTA_DESC;
+  const categoryId = category.value;
+  const categoryDescription = category.text;
 
   const categoryButton = document.createElement("button");
   categoryButton.textContent = categoryDescription;
@@ -136,18 +126,14 @@ function createCategoryButton(category) {
 }
 
 function cargarProductosDeCategoria(categoryId) {
-  fetch(
-    "https://www.ta1.mx/apiPlebes/tacts/ubicacion/apiPlebesProductos",
-    requestOptions
-  )
+  fetch("http://localhost:3008/productos", requestOptions)
     .then((response) => response.json())
     .then((productos) => {
       if (categoryId === null || categoryId === undefined) {
         productos.forEach((product) => {
-          const fileName = product.productoUrl.split("/").pop();
           const card = document.createElement("div");
           card.className = "col-lg-3 col-md-6 col-sm-12";
-          card.innerHTML = cardTemplate(product, fileName);
+          card.innerHTML = cardTemplate(product);
           cardsContainer.appendChild(card);
         });
       } else {
@@ -158,10 +144,9 @@ function cargarProductosDeCategoria(categoryId) {
         cardsContainer.innerHTML = "";
 
         productosDeCategoria.forEach((product) => {
-          const fileName = product.productoUrl.split("/").pop();
           const card = document.createElement("div");
           card.className = "col-lg-4 col-md-6 col-sm-12";
-          card.innerHTML = cardTemplate(product, fileName);
+          card.innerHTML = cardTemplate(product);
           cardsContainer.appendChild(card);
         });
       }
@@ -200,40 +185,47 @@ function agregarDetalle(descripcion, precio, esPropina = false) {
 function agregarProductoATabla(producto) {
   const detalleProducto = document.getElementById("detalleProducto");
   const tbody = detalleProducto.querySelector("tbody");
-
-  const newRow = tbody.insertRow();
-
-  const descripcionCell = newRow.insertCell(0);
-  const precioCell = newRow.insertCell(1);
-
-  descripcionCell.textContent = producto.descripcion;
-  precioCell.textContent = `$${producto.precio}`;
-
-  const aumentarCantidadBtn = document.createElement("button");
-  aumentarCantidadBtn.textContent = "+";
-  aumentarCantidadBtn.classList.add("btn-cantidad");
-  aumentarCantidadBtn.addEventListener("click", () =>
-    aumentarCantidad(producto)
+  const existingRow = Array.from(tbody.rows).find(
+    (row) => row.dataset.descripcion === producto.descripcion
   );
 
-  const disminuirCantidadBtn = document.createElement("button");
-  disminuirCantidadBtn.textContent = "-";
-  disminuirCantidadBtn.classList.add("btn-cantidad");
-  disminuirCantidadBtn.addEventListener("click", () =>
-    disminuirCantidad(producto)
-  );
+  if (existingRow) {
+    producto.cantidad++;
+    actualizarCantidadEnTabla(producto);
+  } else {
+    const newRow = tbody.insertRow();
+    const descripcionCell = newRow.insertCell(0);
+    const precioCell = newRow.insertCell(1);
 
-  const cantidadCell = newRow.insertCell(2);
-  cantidadCell.textContent = producto.cantidad;
-  cantidadCell.classList.add("cantidad-cell");
+    descripcionCell.textContent = producto.descripcion;
+    precioCell.textContent = `$${producto.precio}`;
 
-  const aumentarCantidadCell = newRow.insertCell(3);
-  aumentarCantidadCell.appendChild(aumentarCantidadBtn);
+    const aumentarCantidadBtn = document.createElement("button");
+    aumentarCantidadBtn.textContent = "+";
+    aumentarCantidadBtn.classList.add("btn-cantidad");
+    aumentarCantidadBtn.addEventListener("click", () =>
+      aumentarCantidad(producto)
+    );
 
-  const disminuirCantidadCell = newRow.insertCell(4);
-  disminuirCantidadCell.appendChild(disminuirCantidadBtn);
+    const disminuirCantidadBtn = document.createElement("button");
+    disminuirCantidadBtn.textContent = "-";
+    disminuirCantidadBtn.classList.add("btn-cantidad");
+    disminuirCantidadBtn.addEventListener("click", () =>
+      disminuirCantidad(producto)
+    );
 
-  newRow.dataset.descripcion = producto.descripcion;
+    const cantidadCell = newRow.insertCell(2);
+    cantidadCell.textContent = producto.cantidad;
+    cantidadCell.classList.add("cantidad-cell");
+
+    const aumentarCantidadCell = newRow.insertCell(3);
+    aumentarCantidadCell.appendChild(aumentarCantidadBtn);
+
+    const disminuirCantidadCell = newRow.insertCell(4);
+    disminuirCantidadCell.appendChild(disminuirCantidadBtn);
+
+    newRow.dataset.descripcion = producto.descripcion;
+  }
 }
 
 function aumentarCantidad(producto) {
@@ -319,9 +311,6 @@ function productoSelect() {
   );
   const productoSeleccionado = productoPrecioBusqueda.value;
 
-  // Dividir el valor en descripción y precio utilizando el formato " - "
-  const [descripcion, precio] = productoSeleccionado.split(" - ");
-
   if (descripcion && precio) {
     // Llamar a la función agregarDetalle con la descripción y el precio
     agregarDetalle(descripcion, parseFloat(precio));
@@ -331,37 +320,58 @@ function productoSelect() {
     );
   }
 }
+/*
+function realizarPedido() {
+  // Llena la tabla de detalles del pedido en el modal
+  const tablaSolicitud = document.getElementById("tablaSolicitud");
+  const tbody = tablaSolicitud.querySelector("tbody");
 
-function llenarTablaConfirmacion() {
-  const confirmOrderTableBody = document.getElementById(
-    "confirmOrderTableBody"
-  );
-  confirmOrderTableBody.innerHTML = ""; // Limpia la tabla
+  // Limpia el contenido existente en la tabla de detalles
+  tbody.innerHTML = "";
 
+  // Itera a través de los productos en la orden
   productosEnTabla.forEach((producto) => {
-    const newRow = confirmOrderTableBody.insertRow();
-    newRow.innerHTML = `
+    const row = document.createElement("tr");
+    row.innerHTML = `
       <td>${producto.descripcion}</td>
       <td>$${producto.precio.toFixed(2)}</td>
       <td>${producto.cantidad}</td>
-      <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
     `;
+    tbody.appendChild(row);
   });
 
-  const confirmSubtotal = document.getElementById("confirmSubtotal");
-  const confirmIVA = document.getElementById("confirmIVA");
-  const confirmTotal = document.getElementById("confirmTotal");
+  // Calcula y muestra el subtotal y el total
+  const subtotal = productosEnTabla.reduce(
+    (total, producto) => total + producto.precio * producto.cantidad,
+    0
+  );
+  const iva = subtotal * 0.16; // 16% de IVA (puedes cambiar esto según tus necesidades)
+  const total = subtotal + iva;
 
-  confirmSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-  confirmIVA.textContent = `$${(subtotal * ivaPorcentaje).toFixed(2)}`;
-  confirmTotal.textContent = `$${(subtotal + subtotal * ivaPorcentaje).toFixed(
-    2
-  )}`;
+  // Muestra el subtotal y el total en la tabla de resumen del pedido
+  const resumenPedido = document.getElementById("resumenPedido");
+  resumenPedido.innerHTML = `
+    <tr>
+      <td colspan="2"><strong>Subtotal:</strong></td>
+      <td>$${subtotal.toFixed(2)}</td>
+    </tr>
+    <tr>
+      <td colspan="2"><strong>IVA:</strong></td>
+      <td>$${iva.toFixed(2)}</td>
+    </tr>
+    <tr>
+      <td colspan="2"><strong>Total:</strong></td>
+      <td>$${total.toFixed(2)}</td>
+    </tr>
+  `;
+
+  // Abre el modal `aceptaVenta`
+  $("#aceptaVenta").modal("show");
 }
 
 $("#confirmOrderModal").on("show.bs.modal", function (e) {
   llenarTablaConfirmacion();
-});
+});*/
 
 // Función para construir la tabla de detalles en el modal
 function construirTablaDetalles() {
@@ -389,9 +399,12 @@ function construirTablaDetalles() {
     thPrecio.textContent = "Precio";
     const thCantidad = document.createElement("th");
     thCantidad.textContent = "Cantidad";
+    const thTotal = document.createElement("th");
+    thTotal.textContent = "Total";
     headerRow.appendChild(thDescripcion);
     headerRow.appendChild(thPrecio);
     headerRow.appendChild(thCantidad);
+    headerRow.appendChild(thTotal);
     thead.appendChild(headerRow);
 
     // Agrega filas a la tabla con los productos en la orden
@@ -406,10 +419,14 @@ function construirTablaDetalles() {
       tdPrecio.textContent = precio;
       const tdCantidad = document.createElement("td");
       tdCantidad.textContent = cantidad;
+      const thTotal = document.createElement("td");
+      thTotal.textContent = totalConIvaYPropina;
       row.appendChild(tdDescripcion);
       row.appendChild(tdPrecio);
       row.appendChild(tdCantidad);
+      row.appendChild(thTotal);
       tbody.appendChild(row);
+      const totalConIvaYPropina = subtotalConPropina + ivaConPropina;
     });
 
     // Agrega la tabla al modal
@@ -418,86 +435,43 @@ function construirTablaDetalles() {
     tablaSolicitud.appendChild(table);
   }
 }
-
+/*
 // Ahora, actualiza la función realizarPedido para que también llame a construirTablaDetalles
 function realizarPedido() {
-  const metodoPago = document.getElementById("pagoTipo").textContent;
-  const mesaSeleccionada = document.getElementById("titulMesa").textContent;
-  const subtotal = parseFloat(
-    document.getElementById("subtotal").textContent.replace("$", "")
-  );
-  const iva = parseFloat(
-    document.getElementById("ivas").textContent.replace("$", "")
-  );
-  const total = parseFloat(
-    document.getElementById("totalG").textContent.replace("$", "")
-  );
-
-  const pedidoResumen = `
-    Método de Pago: ${metodoPago}
-    Mesa Seleccionada: ${mesaSeleccionada}
-    Subtotal: $${subtotal.toFixed(2)}
-    IVA: $${iva.toFixed(2)}
-    Total: $${total.toFixed(2)}
-  `;
-
-  // Actualiza el contenido del elemento "resumenPedido" en el modal
-  const resumenPedidoElement = document.getElementById("resumenPedido");
-  resumenPedidoElement.textContent = pedidoResumen;
-
-  // Llama a la función para construir la tabla de detalles en el modal
-  construirTablaDetalles();
-
-  // Abre o muestra el modal si no está abierto
-  $("#aceptaVenta").modal("show");
-}
-
-function realizarPedidoFinal() {
+  // Llena la tabla de detalles del pedido en el modal
   const tablaSolicitud = document.getElementById("tablaSolicitud");
-  const resumenPedido = document.getElementById("resumenPedido");
+  const tbody = tablaSolicitud.querySelector("tbody");
 
-  // Limpia la tabla de resumen antes de agregar los nuevos elementos
-  resumenPedido.innerHTML = "";
+  // Limpia el contenido existente en la tabla de detalles
+  tbody.innerHTML = "";
 
-  const filas = tablaSolicitud.querySelectorAll("tbody tr");
-  filas.forEach((fila) => {
-    const descripcion = fila.cells[0].textContent;
-    const precio = fila.cells[1].textContent;
-    const cantidad = fila.cells[2].textContent;
-
-    // Agrega una fila adicional en la tabla de resumen para cada producto
+  // Itera a través de los productos en la orden
+  productosEnTabla.forEach((producto) => {
     const row = document.createElement("tr");
-    const tdDescripcion = document.createElement("td");
-    tdDescripcion.textContent = descripcion;
-    const tdPrecio = document.createElement("td");
-    tdPrecio.textContent = precio;
-    const tdCantidad = document.createElement("td");
-    tdCantidad.textContent = cantidad;
-    row.appendChild(tdDescripcion);
-    row.appendChild(tdPrecio);
-    row.appendChild(tdCantidad);
-
-    resumenPedido.appendChild(row);
+    row.innerHTML = `
+      <td>${producto.descripcion}</td>
+      <td>$${producto.precio.toFixed(2)}</td>
+      <td>${producto.cantidad}</td>
+    `;
+    tbody.appendChild(row);
   });
 
-  // Aquí puedes realizar cualquier otra lógica de procesamiento del pedido
-}
+  // Calcula el subtotal y el total
+  const subtotal = productosEnTabla.reduce(
+    (total, producto) => total + producto.precio * producto.cantidad,
+    0
+  );
+  const total = subtotal + subtotal * 0.16; // Incluye el 16% de IVA (ajusta según tus necesidades)
 
-function tpago() {
-  banderaTipoPago = !banderaTipoPago;
-  if (banderaTipoPago) {
-    btnTipoPago.innerHTML = `<i class="mr-2" aria-hidden="true">$</i> Efectivo`;
-  } else {
-    btnTipoPago.innerHTML = `<i class="fa fa-credit-card mr-2" aria-hidden="true"></i> Tarjeta`;
-  }
-}
+  // Actualiza el contenido de las filas del subtotal y el total en la tabla
+  const subtotalValue = document.getElementById("subtotalValue");
+  const totalValue = document.getElementById("totalValue");
+  subtotalValue.textContent = `$${subtotal.toFixed(2)}`;
+  totalValue.textContent = `$${total.toFixed(2)}`;
 
-function cobrar() {
-  $("#aceptaVenta").modal("hide");
-  cobrarNormal();
-}
-
-
+  // Abre el modal `aceptaVenta`
+  $("#aceptaVenta").modal("show");
+}*/
 
 function realizarPedido() {
   // Aquí puedes realizar la lógica de procesamiento del pedido
@@ -525,6 +499,7 @@ function realizarPedido() {
     thPrecio.textContent = "Precio";
     const thCantidad = document.createElement("th");
     thCantidad.textContent = "Cantidad";
+
     headerRow.appendChild(thDescripcion);
     headerRow.appendChild(thPrecio);
     headerRow.appendChild(thCantidad);
@@ -556,3 +531,133 @@ function realizarPedido() {
     tablaSolicitud.appendChild(table);
   }
 }
+
+function realizarPedidoFinal() {
+  const tablaSolicitud = document.getElementById("tablaSolicitud");
+  tablaSolicitud.innerHTML = ""; // Limpia la tabla
+
+  const detalleProducto = document.getElementById("detalleProducto");
+  const filas = detalleProducto.querySelectorAll("tbody tr");
+
+  if (filas.length === 0) {
+    // No hay productos en la orden, muestra un mensaje
+    tablaSolicitud.textContent = "No hay productos en la orden.";
+  } else {
+    // Crea la tabla de detalles
+    const table = document.createElement("table");
+    table.className = "table";
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    // Crea la fila de encabezado de la tabla
+    const headerRow = document.createElement("tr");
+    const thDescripcion = document.createElement("th");
+    thDescripcion.textContent = "Descripción";
+    const thPrecio = document.createElement("th");
+    thPrecio.textContent = "Precio";
+    const thCantidad = document.createElement("th");
+    thCantidad.textContent = "Cantidad";
+    const thTotal = document.createElement("th");
+    thTotal.textContent = "Total";
+    headerRow.appendChild(thDescripcion);
+    headerRow.appendChild(thPrecio);
+    headerRow.appendChild(thCantidad);
+    headerRow.appendChild(thTotal);
+    thead.appendChild(headerRow);
+
+    // Agrega filas a la tabla con los productos en la orden
+    filas.forEach((fila) => {
+      const descripcion = fila.cells[0].textContent;
+      const precio = fila.cells[1].textContent;
+      const cantidad = fila.cells[2].textContent;
+      const row = document.createElement("tr");
+      const tdDescripcion = document.createElement("td");
+      tdDescripcion.textContent = descripcion;
+      const tdPrecio = document.createElement("td");
+      tdPrecio.textContent = precio;
+      const tdCantidad = document.createElement("td");
+      tdCantidad.textContent = cantidad;
+      const tdTotal = document.createElement("td");
+      tdTotal.textContent = `$${(
+        parseFloat(precio) * parseInt(cantidad)
+      ).toFixed(2)}`;
+      row.appendChild(tdDescripcion);
+      row.appendChild(tdPrecio);
+      row.appendChild(tdCantidad);
+      row.appendChild(tdTotal);
+      tbody.appendChild(row);
+    });
+
+    // Agrega la tabla al modal
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tablaSolicitud.appendChild(table);
+  }
+
+  // Abre el modal `realizarPedidoFinal`
+  $("#aceptaVenta").modal("show");
+}
+
+function selectMes(numeroMesa) {
+  document.getElementById("selectMesa").value = numeroMesa;
+  document.getElementById("titulMesa").innerHTML = "Mesa-" + numeroMesa;
+  $("#mesaDis").modal("hide");
+
+  // Asignar el valor a numeroMesaSeleccionada
+  numeroMesaSeleccionada = numeroMesa;
+}
+
+function insertarOrdenVenta() {
+  // Obtener el monto de propina ingresado por el usuario
+  const montoPropina = parseFloat(
+    document.getElementById("montoPropina").value
+  );
+
+  // Datos del pedido
+  const datosPedido = {
+    total: parseFloat(
+      document.getElementById("totalG").textContent.replace("$", "")
+    ),
+    subtotal: parseFloat(
+      document.getElementById("subtotal").textContent.replace("$", "")
+    ),
+    iva: parseFloat(
+      document.getElementById("ivas").textContent.replace("$", "")
+    ),
+    numeroMesa: parseInt(numeroMesaSeleccionada),
+    propina: montoPropina,
+  };
+
+  // Enviar datos al servidor Node.js usando fetch
+  fetch("http://localhost:3008/insertarOrdenVenta", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(datosPedido),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Manejar la respuesta del servidor
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error("Error al enviar los datos al servidor:", error);
+    });
+}
+
+$(document).ready(function (e) {
+  // Cierra el modal cuando se hace clic fuera de él
+  $("#mesaDis").click(function (e) {
+    if ($(e.target).is("#mesaDis")) {
+      $("#mesaDis").modal("hide");
+    }
+  });
+
+  // Cierra el modal cuando se pulsa la tecla "Escape"
+  $(document).on("keydown", function (e) {
+    if (e.key === "Escape") {
+      $("#mesaDis").modal("hide");
+    }
+  });
+});

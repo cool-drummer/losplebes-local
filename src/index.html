@@ -206,6 +206,7 @@
             </div>
         </div>
 
+
         <!-- Modales -->
         <div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -261,113 +262,10 @@
             </div>
         </div>
 
-        <!-- Modal direccion-->
-        <div class="modal" tabindex="-1" role="dialog" id="ModalDireccion">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Direcciones Relacionadas</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="DireccionContenido"></div>
-                    </div>
-                    <div class="modal-footer">
-
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal nueva direccion-->
-        <div class="modal" tabindex="-1" role="dialog" id="ModalDireccion0">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nueva Direccion</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="row">
-                            <div class="form-group col-md-6">
-                                <label for="nombre">Telefono</label>
-                                <input type="text" class="form-control" id="tel" placeholder="Telefono">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="nombre">Nombre</label>
-                                <input type="text" class="form-control text-uppercase" id="nombre" placeholder="Nombre "
-                                    onkeyup="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="paterno">A. Paterno</label>
-                                <input type="text" class="form-control text-uppercase" id="paterno"
-                                    placeholder="apellido " onkeyup="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="materno">A. Materno</label>
-                                <input type="text" class="form-control text-uppercase" id="materno"
-                                    placeholder="apellido " onkeyup="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="calle">Calle</label>
-                                <input type="text" class="form-control text-uppercase" id="calle" placeholder="Calle"
-                                    onkeyup="this.value = this.value.toUpperCase()">
-                                <spam class="text-danger" style="display: none" id="vv3">Campo Obligatorio</spam>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="calle">Numero</label>
-                                <input type="number" class="form-control text-uppercase" id="numero" placeholder="#">
-                                <spam class="text-danger" style="display: none" id="vv4">Campo Obligatorio</spam>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="cp">C.P.</label>
-                                <input type="number" class="form-control" id="cp">
-                                <spam class="text-danger" style="display: none" id="vv1">Campo Obligatorio</spam>
-                            </div>
-
-                            <div class="form-group col-md-6">
-                                <label for="colonia">Colonia</label>
-                                <input type="text" class="form-control text-uppercase" id="colonia"
-                                    placeholder="Colonia" onkeyup="this.value = this.value.toUpperCase()">
-                                <spam class="text-danger" style="display: none" id="vv2">Campo Obligatorio</spam>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="ciudad">Ciudad</label>
-                                <input type="text" class="form-control text-uppercase" id="ciudad" placeholder="Calle"
-                                    onkeyup="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="calle">Municipio</label>
-                                <input type="text" class="form-control text-uppercase" id="municipio"
-                                    placeholder="Municipio" onkeyup="this.value = this.value.toUpperCase()">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Estado</label>
-                                <select id="estado" class="form-control chosen-select" tabindex="1">
-
-                                </select>
-                            </div>
-
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" onclick="addDir();"
-                            id="btnAceptarDom">Aceptar</button>
-
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
-        <div id="PDFtoPrint1"></div>
+
+
 
         <!-- Modal propina-->
         <div class="modal" tabindex="-1" role="dialog" id="modalPropina">
@@ -386,7 +284,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
                             </div>
-                            <input type="number" class="form-control" id="montoPropina"
+                            <input type="number" class="form-control" id="montoPropina" name="montoPropina"
                                 aria-label="Amount (to the nearest dollar)">
                             <div class="input-group-append">
                                 <span class="input-group-text">.00</span>
@@ -614,6 +512,7 @@
                     </div>
                     <div class="modal-body">
                         <!-- Tabla de detalles del pedido -->
+                        <h5>Mesa: </h5>
                         <table class="table" id="tablaSolicitud">
                             <thead>
                                 <tr>
@@ -633,10 +532,14 @@
                                 <!-- Aquí aparecerá el resumen del pedido como filas adicionales -->
                             </tbody>
                         </table>
+                        <h5 class="modal-title" id="aceptaVentaLabel">Subtotal: </h5>
+                        <h3 class="modal-title" id="aceptaVentaLabel">Total: </h3>
                     </div>
                     <div class="modal-footer">
+
+
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="realizarPedido()">Confirmar
+                        <button type="button" class="btn btn-primary" onclick="insertarOrdenVenta()">Confirmar
                             Pedido</button>
                     </div>
                 </div>
@@ -702,64 +605,42 @@
 
 
 
-
         <input type="hidden" id="autofocusProducto">
         <input type="hidden" id="tipoP" value="0">
 
 
 
-
     </section>
-    <script src="interface/js/venta.js"></script>
+    <script src="interface/js/productos.js"></script>
     <!-- Incluye jQuery antes de Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-
     <!-- A continuación, incluye Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="interface/js/venta.js"></script>
     <script>
-        $(document).ready(function (e) {
-            // Cierra el modal cuando se hace clic fuera de él
-            $('#mesaDis').click(function (e) {
-                if ($(e.target).is('#mesaDis')) {
-                    $('#mesaDis').modal('hide');
-                }
-            });
 
-            // Cierra el modal cuando se pulsa la tecla "Escape"
-            $(document).on('keydown', function (e) {
-                if (e.key === "Escape") {
-                    $('#mesaDis').modal('hide');
-                }
-            });
-        });
 
+
+        let numeroMesaSeleccionada;
         function abrirmesa() {
-            $('#mesaDis').modal('show');
-            document.getElementById('identifiador').value = ' ';
+            $("#mesaDis").modal("show");
+            document.getElementById("identifiador").value = " ";
 
+    
         }
 
-        function selectMes(val) {
-            document.getElementById('selectMesa').value = val;
-            document.getElementById('titulMesa').innerHTML = 'Mesa-' + val;
-            $('#mesaDis').modal('hide')
-        }
-
+        
+        
         function agregarPropina() {
-
-            var montoP = document.getElementById('montoPropina').value;
-            document.getElementById('totalPropina').innerHTML = montoP;
-            $('#modalPropina').modal('hide')
+            var montoP = document.getElementById("montoPropina").value;
+            document.getElementById("totalPropina").innerHTML = montoP;
+            $("#modalPropina").modal("hide");
 
             sumarTotal();
-
         }
         function limpiarVentana() {
             location.reload();
         }
-
         function addPropina() {
             $("#modalPropina").modal("show");
             document.getElementById("montoPropina").focus(); //totalG
@@ -772,16 +653,21 @@
             // Actualiza los valores de subtotal, IVA y total incluyendo la propina
             actualizarValoresConPropina(propina);
         }
+        function tpago() {
+            banderaTipoPago = !banderaTipoPago;
+            if (banderaTipoPago) {
+                btnTipoPago.innerHTML = `<i class="mr-2" aria-hidden="true">$</i> Efectivo`;
+            } else {
+                btnTipoPago.innerHTML = `<i class="fa fa-credit-card mr-2" aria-hidden="true"></i> Tarjeta`;
+            }
+        }
+        function cobrar() {
+            $("#aceptaVenta").modal("hide");
+            cobrarNormal();
+        }
 
     </script>
     <script src="interface/js/index.js"></script>
-    <script src="interface/js/productos.js"></script>
-
-
-
-
-
-
 
 
 

@@ -180,7 +180,6 @@ function pagarT() {
   botonP.style.disabled = true;
   botonP.innerHTML = "Espere...";
   cerrarBtn.style.display = "none";
-  //let pagoT = document.getElementById('pago').value;
   let maxTabla = cuerpoTabla.rows.length;
   let preUrl = "";
   let preUrl2 = "";
